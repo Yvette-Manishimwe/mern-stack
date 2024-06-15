@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ReactPaginate from 'react-paginate'
 import Search from './Search';
 
@@ -9,6 +9,7 @@ function Home() {
   const [paginationData, setPaginationData] = useState({})
   const [limit, setLimit] = useState(3)
   const [page, setPage] = useState(1)
+  const navigate = useNavigate();
 
 
   const fetchData = async() => {
@@ -43,6 +44,10 @@ function Home() {
     setPage(e.selected + 1)
     fetchData()
   }
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+  };
 
 
 
@@ -110,6 +115,7 @@ function Home() {
       }} className='justify-center text-center bg-gray-200'/>
       </div>
       </div>
+      <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
     </div>
   );
 }

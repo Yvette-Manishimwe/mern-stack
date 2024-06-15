@@ -3,8 +3,10 @@ const mysql = require('mysql');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument= require('./swagger-output.json');
-
+const jwt=require('jsonwebtoken')
+const bcrypt=require('bcrypt')
 const app = express();
+
 
 app.use(cors());
 app.use(express.json());
@@ -87,30 +89,52 @@ app.get("/read/:id",(req,res)=>{
         return res.json(data)
     })
 });
+
+const salt=10
+
 app.post("/signup", (req, res) => {
     const sql = "INSERT INTO login(`name`, `email`, `password`) VALUES (?, ?, ?)";
-    const values = [
-        req.body.name,
-        req.body.email,
-        req.body.password
-    ];
-    db.query(sql, values, (err, data) => {
-        if (err) {
-            return res.json("Error");
+    const password=req.body.password;
+    bcrypt.hash(password.toString(), salt,(err, hash)=>{
+        if(err){
+            console.log(err);
         }
-        return res.json(data);
-    });
+        const values = [
+            req.body.name,
+            req.body.email,
+            hash
+        ];
+        db.query(sql, values, (err, data) => {
+            if (err) {
+                return res.json("Error");
+            }
+            return res.json(data);
+        });
+        
+    })
+
 });
 
 app.post("/login", (req, res) => {
-    const sql = "SELECT *FROM login WHERE `email`= ? AND `password` =?";
+    const sql = "SELECT *FROM login WHERE `email`= ? ";
 
     db.query(sql, [req.body.email, req.body.password], (err, data) => {
         if(err){
             return res.json("Error");
         }
         if (data.length>0) {
-            return res.json("Success");
+            bcrypt.compare(req.body.password.toString(), data[0].password, (err,response)=>{
+                if(err){
+                    return res.json("Error");
+                }
+                if(response) {
+                    const id = data[0].id;
+                    const token = jwt.sign({ id }, "jwtSecretKey", { expiresIn:"1h" });
+                    return res.status(200).json({ Login: true, token, data });
+                }
+                return res.status(200).json({Login: false});
+            })
+
         }
         else{
             return res.json("Failed");
