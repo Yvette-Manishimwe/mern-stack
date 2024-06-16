@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import Search from './Search';
+import SideBar from './Sidebar';
 
 function Home() {
   const [data, setData] = useState([]);
@@ -64,8 +65,12 @@ function Home() {
   };
 
   return (
-    <div className="bg-blue-500 min-h-screen flex items-center justify-center flex-col px-4 md:px-8">
-      <div className="bg-white p-4 md:p-8 rounded-lg w-full max-w-4xl">
+    <div className="grid grid-cols-4  bg-white min-h-screen  flex items-start justify-center flex-col px-4 py-4 md:px-8">
+       
+        <SideBar handleLogout={handleLogout} />
+        
+    
+      <div className="bg-white  p-4 md:p-8 rounded-lg w-full max-w-4xl shadow-md col-span-3">
         <h2 className="text-xl md:text-2xl font-bold mb-4 text-center">Student list</h2>
 
         <div className="relative p-4 w-full mb-10 flex flex-col md:flex-row items-center justify-between">
@@ -150,9 +155,9 @@ function Home() {
           />
         </div>
       </div>
-      <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded mt-4">
+      {/* <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded mt-4">
         Logout
-      </button>
+      </button> */}
     </div>
   );
 }
